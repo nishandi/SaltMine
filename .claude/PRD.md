@@ -371,44 +371,47 @@ Legend: ✅ Done | 🔄 In Progress | ⬜ Not Started
 - ✅ 15. Feature comparison bars (Teams + Slack side by side, bar color = sentiment severity)
 - ✅ 16. 90-day trend chart (Recharts line chart, both platforms overlaid)
 - ✅ 17. Top posts feed (platform badge, subreddit, sentiment dot, upvotes, age)
+- ✅ 18. Wire dashboard to real Supabase data — `useDashboardData` hook fetches posts, spikes, daily_snapshots in parallel; no mock fallbacks; all components show "No data yet" when data is absent
 - ✅ 19. Deploy to GitHub Pages — https://nishandi.github.io/SaltMine/ (live, 2026-02-28)
 
 **Phase 3 — Secondary Screens**
 - ⬜ 20. Feature Deep Dive screen
-- ⬜ 21. Raw Feed screen with filters (scaffold in sidebar as "Raw Feed", placeholder shown)
+- ⬜ 21. Raw Feed screen with filters
 
 ---
 
-## SESSION NOTES — 2026-02-27 (updated)
+## SESSION NOTES — 2026-02-28 (current)
 
-### Phase 1 Complete ✅
-- Supabase project + all 3 tables live ✅
-- Full Python pipeline written (fetcher, classifier, tagger, sentiment, database, main) ✅
-- GitHub Actions deployed on personal account (nishandi/SaltMine) ✅ — runs daily 6am UTC
-- First pipeline run: SUCCESS in 43s ✅
-- Workflow file: `.github/workflows/pipelines.yml` (note: extra 's' from web UI creation)
-- GitHub secrets set: SUPABASE_URL, SUPABASE_SECRET_KEY
+### Status: Phase 1 + Phase 2 fully complete. Site is live with real data.
 
-### Data fetching: RESOLVED ✅
-Switched to Reddit RSS feeds (`/new/.rss`) — no credentials, no IP blocking.
-- First real run: 2026-02-28 00:37 UTC — 15 fetched, 14 stored in Supabase ✅
-- r/MicrosoftTeams: 9 posts, r/Slack: 5, r/productivity: 1
-- RSS gives ~25 posts/subreddit/day — sufficient, accumulates daily
-- Upvotes stored as 0 (not available in RSS) — acceptable for MVP
+### Infrastructure (all ✅)
+- Pipeline: GitHub Actions, daily 6am UTC, `.github/workflows/pipelines.yml`
+- Fetcher: Reddit RSS feeds (`/new/.rss`) — no credentials needed, bypasses IP blocking
+- Database: Supabase PostgreSQL, 3 tables: `posts`, `daily_snapshots`, `spikes`
+- Frontend: https://nishandi.github.io/SaltMine/ (GitHub Pages, auto-deploys on push to master)
+- GitHub secrets: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (pipeline), `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (frontend build)
 
-### Phase 2 Complete ✅
-Homepage dashboard fully built with mock data:
-- Components: KpiTiles, SpikeAlerts, CompetitiveDelta, FeatureComparison, TrendChart, TopPosts, Sidebar
-- Lib: supabase.ts (client), types.ts, mock.ts (realistic mock data)
-- Dark theme: #0a0c10 bg, Syne + DM Mono fonts, dot grid background
-- Build: `npm run build` produces clean dist/ (no TS errors). Dev server requires Node 20.19+ (user has 20.11) — use `npx serve dist` to preview locally on port 3000
-- Repo: nishandi/SaltMine, commit d39342f
+### Data as of 2026-02-28
+- 14 posts in Supabase (8 Teams, 6 Slack) — 1 pipeline run so far
+- Pipeline runs daily — data will accumulate automatically
+- `daily_snapshots` table is empty — populated by aggregation logic in `pipeline/database.py` — will fill once enough posts exist
+- Upvotes stored as 0 (not in RSS) — acceptable for MVP
 
-### Next session priorities (in order):
-1. **Deploy to Azure Static Web Apps** — portal.azure.com → Static Web Apps → Create → GitHub: nishandi/SaltMine, branch: master, preset: Vite, app: `/`, output: `dist`
-2. **Reddit OAuth credentials** — from home network: reddit.com/prefs/apps → script app → add REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET to GitHub secrets → Claude updates fetcher.py
-3. **Wire up real data** — once Supabase has posts, replace MOCK_* with Supabase queries in Dashboard.tsx
-4. **Phase 3** — Feature Deep Dive + Raw Feed screens
+### Dashboard state
+- **KPI tiles**: showing real data (post counts + VADER sentiment averages) ✅
+- **Spike alerts**: showing "No active spikes" (correct — not enough data yet) ✅
+- **Competitive delta, Feature bars, Trend chart**: showing "No data yet" — waiting for `daily_snapshots` to populate ✅
+- **Top posts**: showing real data ✅
+- No mock data anywhere — all fallbacks removed, "No data yet" shown instead
+
+### Tech notes
+- Sentiment: VADER compound score, -1 to +1, scored on title + body
+- Node 20.11 on dev machine — dev server fails, use `npm run build && npx serve dist` for local preview
+- Vite base: `/SaltMine/` (required for GitHub Pages)
+
+### Next session priorities (Phase 3)
+1. **Feature Deep Dive screen** — click feature → 90d trend + stats + all posts for that feature with filters
+2. **Raw Feed screen** — filterable table of all posts (platform, feature, sentiment, date, upvotes, confidence)
 
 ---
 
