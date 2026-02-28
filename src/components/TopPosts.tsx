@@ -15,6 +15,15 @@ function timeAgo(iso: string) {
 }
 
 export function TopPosts({ posts }: { posts: Post[] }) {
+  if (posts.length === 0) {
+    return (
+      <div className="card">
+        <div className="section-title">Top Posts — Last 7 Days</div>
+        <div className="no-data-banner">No posts yet.</div>
+      </div>
+    )
+  }
+
   return (
     <div className="card">
       <div className="section-title">Top Posts — Last 7 Days</div>

@@ -7,7 +7,7 @@ import { TopPosts } from '../components/TopPosts'
 import { useDashboardData } from '../lib/useData'
 
 export function Dashboard() {
-  const { kpi, spikes, topPosts, featureData, trend, isLive, loading } = useDashboardData()
+  const { kpi, spikes, topPosts, featureData, trend, loading } = useDashboardData()
 
   return (
     <div className="main-content">
@@ -29,11 +29,6 @@ export function Dashboard() {
 
       {loading && (
         <div className="no-data-banner">Loading data from Supabase...</div>
-      )}
-      {!loading && !isLive && (
-        <div className="no-data-banner">
-          Showing mock data — pipeline running but not enough data yet. Check back tomorrow.
-        </div>
       )}
 
       <KpiTiles data={kpi} />

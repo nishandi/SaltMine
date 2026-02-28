@@ -2,6 +2,15 @@ import type { FeatureRow } from '../lib/useData'
 import { FEATURE_LABELS } from '../lib/types'
 
 export function CompetitiveDelta({ featureData }: { featureData: Record<string, FeatureRow> }) {
+  if (Object.keys(featureData).length === 0) {
+    return (
+      <div style={{ marginBottom: '24px' }}>
+        <div className="section-title">Teams vs Slack — Sentiment Delta by Feature</div>
+        <div className="no-data-banner">No data yet — check back after the pipeline runs.</div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ marginBottom: '24px' }}>
       <div className="section-title">Teams vs Slack — Sentiment Delta by Feature</div>

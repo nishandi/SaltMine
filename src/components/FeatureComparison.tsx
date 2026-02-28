@@ -52,6 +52,15 @@ function PlatformBars({ platform, featureData }: { platform: 'teams' | 'slack'; 
 }
 
 export function FeatureComparison({ featureData }: { featureData: Record<string, FeatureRow> }) {
+  if (Object.keys(featureData).length === 0) {
+    return (
+      <div style={{ marginBottom: '24px' }}>
+        <div className="section-title">Feature Volume &amp; Sentiment</div>
+        <div className="no-data-banner">No data yet — check back after the pipeline runs.</div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ marginBottom: '24px' }}>
       <div className="section-title">Feature Volume &amp; Sentiment</div>

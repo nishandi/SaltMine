@@ -22,6 +22,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export function TrendChart({ trend }: { trend: TrendRow[] }) {
+  if (trend.length === 0) {
+    return (
+      <div className="card">
+        <div className="section-title">90-Day Trend — Weekly Post Volume</div>
+        <div className="no-data-banner">No data yet — check back after a few pipeline runs.</div>
+      </div>
+    )
+  }
+
   return (
     <div className="card">
       <div className="section-title">90-Day Trend — Weekly Post Volume</div>

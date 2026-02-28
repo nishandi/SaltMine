@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import type { KpiData, Spike, Post } from './types'
-import { MOCK_KPI, MOCK_SPIKES, MOCK_TOP_POSTS, MOCK_FEATURE_DATA, MOCK_TREND } from './mock'
 
 export interface FeatureRow {
   teams: number
@@ -26,6 +25,17 @@ export interface DashboardData {
   loading: boolean
 }
 
+const EMPTY_KPI: KpiData = {
+  teamsPosts: 0,
+  slackPosts: 0,
+  teamsAvgSentiment: 0,
+  slackAvgSentiment: 0,
+  activeSpikes: 0,
+  windowStart: '—',
+  windowEnd: '—',
+  lastRun: '—',
+}
+
 function weekLabel(dateStr: string): string {
   const d = new Date(dateStr)
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
@@ -33,11 +43,11 @@ function weekLabel(dateStr: string): string {
 
 export function useDashboardData(): DashboardData {
   const [data, setData] = useState<DashboardData>({
-    kpi: MOCK_KPI,
-    spikes: MOCK_SPIKES,
-    topPosts: MOCK_TOP_POSTS,
-    featureData: MOCK_FEATURE_DATA,
-    trend: MOCK_TREND,
+    kpi: EMPTY_KPI,
+    spikes: [],
+    topPosts: [],
+    featureData: {},
+    trend: [],
     isLive: false,
     loading: true,
   })
@@ -69,9 +79,8 @@ export function useDashboardData(): DashboardData {
         const spikes: Spike[] = spikesRes.data ?? []
         const snapshots = snapshotsRes.data ?? []
 
-        // Fall back to mock if no real data yet
         if (posts.length === 0) {
-          setData(d => ({ ...d, loading: false }))
+          setData({ kpi: EMPTY_KPI, spikes, topPosts: [], featureData: {}, trend: [], isLive: false, loading: false })
           return
         }
 
@@ -82,8 +91,8 @@ export function useDashboardData(): DashboardData {
         const slackAvg = slackPosts.reduce((s, p) => s + (p.sentiment_score ?? 0), 0) / (slackPosts.length || 1)
 
         const allDates = posts.map(p => p.created_utc).sort()
-        const windowStart = allDates[0]?.slice(0, 10) ?? MOCK_KPI.windowStart
-        const windowEnd = allDates[allDates.length - 1]?.slice(0, 10) ?? MOCK_KPI.windowEnd
+        const windowStart = allDates[0]?.slice(0, 10) ?? '—'
+        const windowEnd = allDates[allDates.length - 1]?.slice(0, 10) ?? '—'
 
         const kpi: KpiData = {
           teamsPosts: teamsPosts.length,
@@ -134,15 +143,7 @@ export function useDashboardData(): DashboardData {
           .slice(-13)
           .map(([week, v]) => ({ week, ...v }))
 
-        setData({
-          kpi,
-          spikes,
-          topPosts,
-          featureData: Object.keys(featureData).length > 0 ? featureData : MOCK_FEATURE_DATA,
-          trend: trend.length > 1 ? trend : MOCK_TREND,
-          isLive: true,
-          loading: false,
-        })
+        setData({ kpi, spikes, topPosts, featureData, trend, isLive: true, loading: false })
       } catch (err) {
         console.error('Supabase fetch failed:', err)
         setData(d => ({ ...d, loading: false }))
