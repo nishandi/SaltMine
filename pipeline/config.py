@@ -57,5 +57,4 @@ SPIKE_THRESHOLD = 1.5       # 50% higher than 4-week avg
 SPIKE_WINDOW_DAYS = 7       # "current week"
 SPIKE_BASELINE_START = 8    # days 8–35 = the 4-week baseline
 SPIKE_BASELINE_END = 35
-REDDIT_USER_AGENT = "saltmine-collector/1.0 (personal research dashboard)"
 DB_BATCH_SIZE = 100
