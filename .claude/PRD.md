@@ -359,11 +359,11 @@ Legend: ✅ Done | 🔄 In Progress | ⬜ Not Started
 - ✅ 5. Write VADER sentiment scorer
 - ✅ 6. Write database insertion logic (upsert + batching)
 - ✅ 7. Write 90-day rolling window cleanup + daily_snapshots + spike detection
-- ✅ 8. Test: pipeline runs clean, Supabase connected (Reddit blocked on corp network — will work on Render)
-- 🔄 9. Deploy to Render as daily cron job
+- ✅ 8. Test: pipeline runs clean, Supabase connected (Reddit blocked on corp network — expected)
+- ✅ 9. Deploy pipeline as daily cron job — GitHub Actions on personal account (nishandi/SaltMine), runs daily at 6am UTC. First manual run succeeded (43s). Posts = 0 because Reddit blocks GitHub Actions' Azure IPs — fix is Reddit OAuth credentials (one-time setup from home network, see blocker note below).
 
 **Phase 2 — Homepage Dashboard**
-- ⬜ 10. Set up React project (✅ scaffolded), deploy to Azure Static Web Apps
+- 🔄 10. Set up React project (✅ scaffolded), deploy to Azure Static Web Apps
 - ⬜ 11. Connect Supabase JS client
 - ⬜ 12. Build KPI tiles
 - ⬜ 13. Build spike alerts section
@@ -375,6 +375,31 @@ Legend: ✅ Done | 🔄 In Progress | ⬜ Not Started
 **Phase 3 — Secondary Screens**
 - ⬜ 18. Feature Deep Dive screen
 - ⬜ 19. Raw Feed screen with filters
+
+---
+
+## SESSION NOTES — 2026-02-27 (updated)
+
+### Phase 1 Complete ✅
+- Supabase project + all 3 tables live ✅
+- Full Python pipeline written (fetcher, classifier, tagger, sentiment, database, main) ✅
+- GitHub Actions deployed on personal account (nishandi/SaltMine) ✅ — runs daily 6am UTC
+- First pipeline run: SUCCESS in 43s ✅
+- Workflow file: `.github/workflows/pipelines.yml` (note: extra 's' from web UI creation)
+- GitHub secrets set: SUPABASE_URL, SUPABASE_SECRET_KEY
+
+### Active Blocker: Reddit OAuth credentials needed
+Reddit blocks unauthenticated requests from GitHub Actions' Azure IP ranges (403 Blocked).
+Fix: Create a free Reddit script app from a **non-corporate network** (home WiFi or phone hotspot):
+1. Go to reddit.com/prefs/apps → create app → type: "script" → redirect: `http://localhost`
+2. Get `client_id` + `client_secret`
+3. Add as GitHub secrets: REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET
+4. Update fetcher.py to use OAuth token (Claude will write this)
+
+Until then, pipeline runs successfully every day but fetches 0 posts.
+
+### Current focus: Phase 2 — React dashboard
+Building with mock data. Will wire up Supabase once Reddit OAuth is set up and real data flows.
 
 ---
 
