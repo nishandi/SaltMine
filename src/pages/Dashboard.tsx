@@ -4,10 +4,10 @@ import { CompetitiveDelta } from '../components/CompetitiveDelta'
 import { FeatureComparison } from '../components/FeatureComparison'
 import { TrendChart } from '../components/TrendChart'
 import { TopPosts } from '../components/TopPosts'
-import { MOCK_KPI, MOCK_SPIKES, MOCK_TOP_POSTS } from '../lib/mock'
+import { useDashboardData } from '../lib/useData'
 
 export function Dashboard() {
-  const kpi = MOCK_KPI
+  const { kpi, spikes, topPosts, featureData, trend, isLive, loading } = useDashboardData()
 
   return (
     <div className="main-content">
@@ -27,19 +27,23 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="no-data-banner">
-        ⚡ Showing mock data — pipeline is live but Reddit OAuth credentials needed to fetch real posts.
-        See PRD for setup steps.
-      </div>
+      {loading && (
+        <div className="no-data-banner">Loading data from Supabase...</div>
+      )}
+      {!loading && !isLive && (
+        <div className="no-data-banner">
+          Showing mock data — pipeline running but not enough data yet. Check back tomorrow.
+        </div>
+      )}
 
       <KpiTiles data={kpi} />
-      <SpikeAlerts spikes={MOCK_SPIKES} />
-      <CompetitiveDelta />
-      <FeatureComparison />
+      <SpikeAlerts spikes={spikes} />
+      <CompetitiveDelta featureData={featureData} />
+      <FeatureComparison featureData={featureData} />
 
       <div className="bottom-row">
-        <TrendChart />
-        <TopPosts posts={MOCK_TOP_POSTS} />
+        <TrendChart trend={trend} />
+        <TopPosts posts={topPosts} />
       </div>
     </div>
   )

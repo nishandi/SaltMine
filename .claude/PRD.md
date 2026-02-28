@@ -363,18 +363,19 @@ Legend: ✅ Done | 🔄 In Progress | ⬜ Not Started
 - ✅ 9. Deploy pipeline as daily cron job — GitHub Actions on personal account (nishandi/SaltMine), runs daily at 6am UTC. First manual run succeeded (43s). Posts = 0 because Reddit blocks GitHub Actions' Azure IPs — fix is Reddit OAuth credentials (one-time setup from home network, see blocker note below).
 
 **Phase 2 — Homepage Dashboard**
-- 🔄 10. Set up React project (✅ scaffolded), deploy to Azure Static Web Apps
-- ⬜ 11. Connect Supabase JS client
-- ⬜ 12. Build KPI tiles
-- ⬜ 13. Build spike alerts section
-- ⬜ 14. Build competitive delta strip
-- ⬜ 15. Build feature comparison bars (Teams + Slack side by side)
-- ⬜ 16. Build 90-day trend chart
-- ⬜ 17. Build top posts feed
+- ✅ 10. React project built — all homepage components complete, pushed to nishandi/SaltMine master
+- ✅ 11. Supabase JS client wired up (reads from VITE_SUPABASE_URL + VITE_SUPABASE_PUBLISHABLE_KEY)
+- ✅ 12. KPI tiles (Teams posts, Slack posts, avg sentiment, active spikes)
+- ✅ 13. Spike alerts section (amber cards with %, feature name, post count vs avg)
+- ✅ 14. Competitive delta strip (per-feature sentiment delta chips, color coded)
+- ✅ 15. Feature comparison bars (Teams + Slack side by side, bar color = sentiment severity)
+- ✅ 16. 90-day trend chart (Recharts line chart, both platforms overlaid)
+- ✅ 17. Top posts feed (platform badge, subreddit, sentiment dot, upvotes, age)
+- ✅ 19. Deploy to GitHub Pages — https://nishandi.github.io/SaltMine/ (live, 2026-02-28)
 
 **Phase 3 — Secondary Screens**
-- ⬜ 18. Feature Deep Dive screen
-- ⬜ 19. Raw Feed screen with filters
+- ⬜ 20. Feature Deep Dive screen
+- ⬜ 21. Raw Feed screen with filters (scaffold in sidebar as "Raw Feed", placeholder shown)
 
 ---
 
@@ -388,18 +389,26 @@ Legend: ✅ Done | 🔄 In Progress | ⬜ Not Started
 - Workflow file: `.github/workflows/pipelines.yml` (note: extra 's' from web UI creation)
 - GitHub secrets set: SUPABASE_URL, SUPABASE_SECRET_KEY
 
-### Active Blocker: Reddit OAuth credentials needed
-Reddit blocks unauthenticated requests from GitHub Actions' Azure IP ranges (403 Blocked).
-Fix: Create a free Reddit script app from a **non-corporate network** (home WiFi or phone hotspot):
-1. Go to reddit.com/prefs/apps → create app → type: "script" → redirect: `http://localhost`
-2. Get `client_id` + `client_secret`
-3. Add as GitHub secrets: REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET
-4. Update fetcher.py to use OAuth token (Claude will write this)
+### Data fetching: RESOLVED ✅
+Switched to Reddit RSS feeds (`/new/.rss`) — no credentials, no IP blocking.
+- First real run: 2026-02-28 00:37 UTC — 15 fetched, 14 stored in Supabase ✅
+- r/MicrosoftTeams: 9 posts, r/Slack: 5, r/productivity: 1
+- RSS gives ~25 posts/subreddit/day — sufficient, accumulates daily
+- Upvotes stored as 0 (not available in RSS) — acceptable for MVP
 
-Until then, pipeline runs successfully every day but fetches 0 posts.
+### Phase 2 Complete ✅
+Homepage dashboard fully built with mock data:
+- Components: KpiTiles, SpikeAlerts, CompetitiveDelta, FeatureComparison, TrendChart, TopPosts, Sidebar
+- Lib: supabase.ts (client), types.ts, mock.ts (realistic mock data)
+- Dark theme: #0a0c10 bg, Syne + DM Mono fonts, dot grid background
+- Build: `npm run build` produces clean dist/ (no TS errors). Dev server requires Node 20.19+ (user has 20.11) — use `npx serve dist` to preview locally on port 3000
+- Repo: nishandi/SaltMine, commit d39342f
 
-### Current focus: Phase 2 — React dashboard
-Building with mock data. Will wire up Supabase once Reddit OAuth is set up and real data flows.
+### Next session priorities (in order):
+1. **Deploy to Azure Static Web Apps** — portal.azure.com → Static Web Apps → Create → GitHub: nishandi/SaltMine, branch: master, preset: Vite, app: `/`, output: `dist`
+2. **Reddit OAuth credentials** — from home network: reddit.com/prefs/apps → script app → add REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET to GitHub secrets → Claude updates fetcher.py
+3. **Wire up real data** — once Supabase has posts, replace MOCK_* with Supabase queries in Dashboard.tsx
+4. **Phase 3** — Feature Deep Dive + Raw Feed screens
 
 ---
 

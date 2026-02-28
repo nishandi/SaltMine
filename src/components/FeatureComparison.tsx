@@ -1,4 +1,4 @@
-import { MOCK_FEATURE_DATA } from '../lib/mock'
+import type { FeatureRow } from '../lib/useData'
 import { FEATURE_LABELS } from '../lib/types'
 
 function sentimentColor(v: number) {
@@ -7,14 +7,14 @@ function sentimentColor(v: number) {
   return 'var(--teams)'
 }
 
-function PlatformBars({ platform }: { platform: 'teams' | 'slack' }) {
+function PlatformBars({ platform, featureData }: { platform: 'teams' | 'slack'; featureData: Record<string, FeatureRow> }) {
   const color = platform === 'teams' ? 'var(--teams)' : 'var(--slack)'
-  const sentiment = Object.values(MOCK_FEATURE_DATA).reduce(
+  const sentiment = Object.values(featureData).reduce(
     (sum, d) => sum + (platform === 'teams' ? d.teamsSentiment : d.slackSentiment), 0
-  ) / Object.keys(MOCK_FEATURE_DATA).length
+  ) / Object.keys(featureData).length
 
   const maxCount = Math.max(
-    ...Object.values(MOCK_FEATURE_DATA).map(d => platform === 'teams' ? d.teams : d.slack)
+    ...Object.values(featureData).map(d => platform === 'teams' ? d.teams : d.slack)
   )
 
   return (
@@ -29,7 +29,7 @@ function PlatformBars({ platform }: { platform: 'teams' | 'slack' }) {
         </div>
       </div>
 
-      {Object.entries(MOCK_FEATURE_DATA).map(([tag, d]) => {
+      {Object.entries(featureData).map(([tag, d]) => {
         const count = platform === 'teams' ? d.teams : d.slack
         const sent = platform === 'teams' ? d.teamsSentiment : d.slackSentiment
         const pct = (count / maxCount) * 100
@@ -51,13 +51,13 @@ function PlatformBars({ platform }: { platform: 'teams' | 'slack' }) {
   )
 }
 
-export function FeatureComparison() {
+export function FeatureComparison({ featureData }: { featureData: Record<string, FeatureRow> }) {
   return (
     <div style={{ marginBottom: '24px' }}>
       <div className="section-title">Feature Volume &amp; Sentiment</div>
       <div className="comparison-grid">
-        <PlatformBars platform="teams" />
-        <PlatformBars platform="slack" />
+        <PlatformBars platform="teams" featureData={featureData} />
+        <PlatformBars platform="slack" featureData={featureData} />
       </div>
     </div>
   )

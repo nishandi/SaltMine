@@ -1,5 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { MOCK_TREND } from '../lib/mock'
+import type { TrendRow } from '../lib/useData'
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
@@ -21,13 +21,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export function TrendChart() {
+export function TrendChart({ trend }: { trend: TrendRow[] }) {
   return (
     <div className="card">
       <div className="section-title">90-Day Trend — Weekly Post Volume</div>
       <div style={{ height: '200px' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={MOCK_TREND} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
+          <LineChart data={trend} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
             <XAxis
               dataKey="week"
               tick={{ fill: 'var(--muted)', fontSize: 10, fontFamily: 'DM Mono' }}

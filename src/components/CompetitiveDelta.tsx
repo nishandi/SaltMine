@@ -1,12 +1,12 @@
-import { MOCK_FEATURE_DATA } from '../lib/mock'
+import type { FeatureRow } from '../lib/useData'
 import { FEATURE_LABELS } from '../lib/types'
 
-export function CompetitiveDelta() {
+export function CompetitiveDelta({ featureData }: { featureData: Record<string, FeatureRow> }) {
   return (
     <div style={{ marginBottom: '24px' }}>
       <div className="section-title">Teams vs Slack — Sentiment Delta by Feature</div>
       <div className="delta-strip">
-        {Object.entries(MOCK_FEATURE_DATA).map(([tag, d]) => {
+        {Object.entries(featureData).map(([tag, d]) => {
           const delta = d.teamsSentiment - d.slackSentiment
           const better = delta > 0.03
           const worse = delta < -0.03
